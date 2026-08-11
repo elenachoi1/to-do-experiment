@@ -1,0 +1,20 @@
+{
+  "projectId": "10093180404268797687",
+  "title": "Todo Responsive Redesign",
+  "screens": [
+    {
+      "screenId": "15919650840966527805",
+      "title": "/",
+      "deviceType": "DESKTOP",
+      "width": 1280,
+      "height": 800
+    }
+  ],
+  "designSystem": {
+    "assetId": "aad1c042d1864a309272744d4af09853",
+    "primaryColor": "#2253cf",
+    "secondaryColor": "#e9f0fe",
+    "backgroundColor": "#ffffff",
+    "fontFamily": "GEIST"
+  }
+}
