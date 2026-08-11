@@ -3,11 +3,25 @@
   "title": "Todo Responsive Redesign",
   "screens": [
     {
-      "screenId": "15919650840966527805",
-      "title": "/",
+      "screenId": "b96db442831d44429e6c9feb8243e1fc",
+      "title": "Momentum Todo — Desktop (Enhanced)",
       "deviceType": "DESKTOP",
       "width": 1280,
-      "height": 800
+      "height": 1024
+    },
+    {
+      "screenId": "875b225acdd04930899b3621cd8558c8",
+      "title": "Momentum Todo — Tablet (Optimized)",
+      "deviceType": "TABLET",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "screenId": "321edb8a148e4de18f2b53961079ad88",
+      "title": "Momentum Todo — Mobile",
+      "deviceType": "MOBILE",
+      "width": 390,
+      "height": 884
     }
   ],
   "designSystem": {
