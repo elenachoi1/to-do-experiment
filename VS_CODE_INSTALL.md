@@ -97,7 +97,7 @@ The Terminal method only works if the VS Code `code` command is installed.
 ## 6. Open this project in the container
 
 1. Make sure Docker Desktop is running.
-2. Open the `ai-agentic-tools-template` repository in VS Code.
+2. Open the `to-do-experiment` repository in VS Code.
 3. Press `Cmd+Shift+P`.
 4. Run **Dev Containers: Reopen in Container**.
 5. Wait while VS Code downloads the image and runs the setup commands. The first launch may take several minutes.
@@ -109,9 +109,16 @@ When initialization finishes, the lower-left corner of VS Code should indicate t
 Open a new VS Code terminal and run:
 
 ```bash
-ls -la .devcontainer configs .skillshare
-skillshare --version
+ls -la .devcontainer .agents/skills configs scripts
+npx --no-install skills list
+npm run build
+npm run lint
 ```
+
+Google Stitch support is optional. To enable it, add `STITCH_API_KEY` as a
+Codespaces secret before rebuilding the container. Do not put the key in a
+repository file. See `docs/agent-tooling.md` for MCP verification and manual
+setup commands.
 
 To rerun everything in a clean container later, open the Command Palette with `Cmd+Shift+P` and select **Dev Containers: Rebuild and Reopen in Container**.
 

@@ -9,12 +9,10 @@ import {
   ClipboardList,
   Inbox,
   ListFilter,
-  Menu,
   MoreHorizontal,
   Plus,
   Search,
   Settings,
-  SlidersHorizontal,
   Sun,
   UserCircle,
 } from "lucide-react"
@@ -42,14 +40,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
 import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
@@ -160,8 +150,6 @@ function App() {
   const [search, setSearch] = useState("")
   const [priorityFilter, setPriorityFilter] = useState<Priority>("none")
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [mobileNavOpen, setMobileNavOpen] = useState(false)
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [draft, setDraft] = useState({ title: "", description: "", dueDate: today, priority: "none" as Priority })
@@ -199,11 +187,7 @@ function App() {
   }
 
   const openTask = (task: Task) => {
-    if (window.matchMedia("(min-width: 1024px)").matches) {
-      setSelectedTask(task)
-      return
-    }
-    openEditTask(task)
+    setSelectedTask(task)
   }
 
   const saveTask = () => {
@@ -220,11 +204,6 @@ function App() {
     setTasks((current) => current.map((task) => task.id === id ? { ...task, completed: !task.completed } : task))
   }
 
-  const navigate = (nextView: View) => {
-    setView(nextView)
-    setMobileNavOpen(false)
-  }
-
   const currentLabel = navItems.find((item) => item.value === view)?.label ?? "Tasks"
   const activeSelectedTask = selectedTask ? tasks.find((task) => task.id === selectedTask.id) ?? null : null
   const completedPercentage = tasks.length > 0 ? Math.round((counts.completed / tasks.length) * 100) : 0
@@ -232,70 +211,15 @@ function App() {
   return (
     <TooltipProvider>
       <div className="min-h-dvh bg-background text-foreground">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-4 md:hidden">
-          <div className="flex items-center gap-2">
-            <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon-lg" aria-label="Open navigation">
-                  <Menu />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[280px] p-0" showCloseButton>
-                <SheetHeader className="sr-only">
-                  <SheetTitle>Momentum navigation</SheetTitle>
-                  <SheetDescription>Navigate between task views and workspace settings.</SheetDescription>
-                </SheetHeader>
-                <NavigationPanel counts={counts} view={view} onNavigate={navigate} onAddTask={openNewTask} />
-              </SheetContent>
-            </Sheet>
-            <span className="font-semibold tracking-tight">Momentum</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon-lg"
-              aria-label={mobileSearchOpen ? "Close search" : "Search tasks"}
-              onClick={() => setMobileSearchOpen((open) => !open)}
-            >
-              <Search />
-            </Button>
-            <Button variant="ghost" size="icon-lg" className="relative" aria-label="Notifications">
-              <Bell />
-              <span className="absolute right-2 top-2 size-2 rounded-full bg-destructive" />
-            </Button>
-          </div>
-        </header>
-
-        {mobileSearchOpen && (
-          <div className="sticky top-16 z-20 border-b bg-background p-3 md:hidden">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                autoFocus
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search tasks…"
-                className="h-11 pl-9"
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="flex min-h-[calc(100dvh-4rem)] md:min-h-dvh">
-          <aside className="hidden w-64 shrink-0 border-r bg-muted/30 lg:block">
+        <div className="flex min-h-dvh min-w-[1280px]">
+          <aside className="w-64 shrink-0 border-r bg-muted/30">
             <div className="sticky top-0 h-dvh">
-              <NavigationPanel counts={counts} view={view} onNavigate={navigate} onAddTask={openNewTask} />
+              <NavigationPanel counts={counts} view={view} onNavigate={setView} onAddTask={openNewTask} />
             </div>
           </aside>
 
           <div className="min-w-0 flex-1">
-            <header className="sticky top-0 z-20 hidden h-[76px] items-center gap-4 border-b bg-background px-5 md:flex lg:px-8">
-              <div className="flex items-center gap-2 lg:hidden">
-                <Button variant="ghost" size="icon" aria-label="Open navigation" onClick={() => setMobileNavOpen(true)}>
-                  <Menu />
-                </Button>
-                <span className="font-semibold tracking-tight">Momentum</span>
-              </div>
+            <header className="sticky top-0 z-20 flex h-[76px] items-center gap-4 border-b bg-background px-8">
               <div className="relative max-w-md flex-1">
                 <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search tasks…" className="pl-9" />
@@ -308,7 +232,7 @@ function App() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="gap-2">
                     <span className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">EC</span>
-                    <span className="hidden lg:inline">Elena</span>
+                    <span>Elena</span>
                     <ChevronDown className="text-muted-foreground" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -325,43 +249,21 @@ function App() {
               </DropdownMenu>
             </header>
 
-            <main className="min-h-[calc(100dvh-4rem)] bg-muted/15 px-4 py-5 pb-24 md:min-h-[calc(100dvh-4.75rem)] md:px-5 md:py-8 md:pb-8 lg:px-8">
-              <div className="mx-auto max-w-3xl lg:grid lg:max-w-7xl lg:grid-cols-[minmax(0,1fr)_256px] lg:gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+            <main className="min-h-[calc(100dvh-4.75rem)] bg-muted/15 px-8 py-8">
+              <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_320px] gap-6">
                 <section className="min-w-0">
                 <div className="flex items-end justify-between gap-4">
                   <div>
-                    <p className="mb-1 hidden text-sm font-medium text-primary lg:block">Tuesday, August 11</p>
-                    <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{currentLabel}</h1>
-                    <p className="mt-1 hidden text-sm text-muted-foreground md:block">
+                    <p className="mb-1 text-sm font-medium text-primary">Tuesday, August 11</p>
+                    <h1 className="text-3xl font-semibold tracking-tight">{currentLabel}</h1>
+                    <p className="mt-1 text-sm text-muted-foreground">
                       {view === "completed" ? "A record of everything you've finished." : `${visibleTasks.length} task${visibleTasks.length === 1 ? "" : "s"} remaining`}
                     </p>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-muted-foreground md:hidden">
-                      {visibleTasks.length} {visibleTasks.length === 1 ? "Task" : "Tasks"}
-                    </span>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon-lg" className="md:hidden" aria-label="Filter tasks">
-                          <SlidersHorizontal />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Priority</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                          {(["none", "high", "medium", "low"] as Priority[]).map((priority) => (
-                            <DropdownMenuItem key={priority} onClick={() => setPriorityFilter(priority)}>
-                              {priority === "none" ? "All priorities" : `${priority[0].toUpperCase()}${priority.slice(1)} priority`}
-                              {priorityFilter === priority && <CheckCircle2 className="ml-auto" />}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                     <Select value={priorityFilter} onValueChange={(value) => setPriorityFilter(value as Priority)}>
-                      <SelectTrigger className="hidden w-40 md:flex">
+                      <SelectTrigger className="w-40">
                         <ListFilter />
                         <SelectValue placeholder="Priority" />
                       </SelectTrigger>
@@ -377,35 +279,30 @@ function App() {
                   </div>
                 </div>
 
-                <div className="mt-4 overflow-hidden rounded-xl border bg-background shadow-sm md:mt-8">
+                <div className="mt-8 overflow-hidden rounded-xl border bg-background shadow-sm">
                   {visibleTasks.length > 0 ? visibleTasks.map((task, index) => (
                     <div
                       key={task.id}
                       className={cn(
-                        "group flex min-h-16 items-start gap-3 px-4 py-4 transition-colors hover:bg-muted/50 md:items-center md:gap-4 md:px-5",
+                        "group flex min-h-16 items-center gap-4 px-5 py-4 transition-colors hover:bg-muted/50",
                         index > 0 && "border-t",
                       )}
                     >
                       <Checkbox
-                        className="mt-0.5 md:mt-0"
                         checked={task.completed}
                         onCheckedChange={() => toggleTask(task.id)}
                         aria-label={`Mark ${task.title} ${task.completed ? "incomplete" : "complete"}`}
                       />
                       <button className="min-w-0 flex-1 text-left" onClick={() => openTask(task)}>
-                        <p className={cn("text-sm font-medium leading-snug md:truncate", task.completed && "text-muted-foreground line-through")}>{task.title}</p>
-                        <p className="mt-1 hidden truncate text-xs text-muted-foreground md:block">{task.description || "No description"}</p>
-                        <span className="mt-1 flex items-center gap-1 text-xs text-muted-foreground md:hidden">
-                          <CalendarDays className="size-3.5" /> {formatDate(task.dueDate)}
-                        </span>
+                        <p className={cn("truncate text-sm font-medium leading-snug", task.completed && "text-muted-foreground line-through")}>{task.title}</p>
+                        <p className="mt-1 truncate text-xs text-muted-foreground">{task.description || "No description"}</p>
                       </button>
                       {task.priority !== "none" && (
                         <Badge variant="outline" className={cn("shrink-0 border-transparent capitalize", priorityStyles[task.priority])}>
-                          <span className="md:hidden">{task.priority === "medium" ? "Med" : task.priority}</span>
-                          <span className="hidden md:inline">{task.priority}</span>
+                          {task.priority}
                         </Badge>
                       )}
-                      <div className="hidden w-24 items-center gap-1.5 text-xs text-muted-foreground md:flex">
+                      <div className="flex w-24 items-center gap-1.5 text-xs text-muted-foreground">
                         <CalendarDays className="size-3.5" /> {formatDate(task.dueDate)}
                       </div>
                       <Tooltip>
@@ -437,12 +334,12 @@ function App() {
                   )}
                 </div>
 
-                <Button variant="outline" className="mt-4 hidden w-full justify-start text-muted-foreground md:flex" onClick={openNewTask}>
+                <Button variant="outline" className="mt-4 w-full justify-start text-muted-foreground" onClick={openNewTask}>
                   <Plus data-icon="inline-start" /> Quick add task…
                 </Button>
                 </section>
 
-                <aside className="hidden flex-col gap-4 lg:flex">
+                <aside className="flex flex-col gap-4">
                   <div className="rounded-xl border bg-background p-4 shadow-sm">
                     <div className="flex items-center justify-between gap-3">
                       <h2 className="text-sm font-semibold">Task details</h2>
@@ -501,13 +398,10 @@ function App() {
           </div>
         </div>
 
-        <Button size="icon-lg" className="fixed bottom-6 right-6 size-14 rounded-full shadow-lg md:hidden" onClick={openNewTask} aria-label="Add task">
-          <Plus className="size-6" />
-        </Button>
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-lg">
+        <DialogContent className="max-h-[calc(100dvh-2rem)] max-w-lg overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingTask ? "Edit task" : "Add a new task"}</DialogTitle>
             <DialogDescription>{editingTask ? "Update the task details below." : "Capture what needs to get done."}</DialogDescription>
@@ -521,7 +415,7 @@ function App() {
               <label htmlFor="task-description" className="text-sm font-medium">Description</label>
               <Textarea id="task-description" value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} placeholder="Add any helpful details…" />
             </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <label htmlFor="task-date" className="text-sm font-medium">Due date</label>
                 <Input id="task-date" type="date" value={draft.dueDate} onChange={(event) => setDraft({ ...draft, dueDate: event.target.value })} />

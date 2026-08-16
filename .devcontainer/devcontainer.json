@@ -1,8 +1,11 @@
 {
+  "name": "Momentum Todo",
   "image": "ghcr.io/calvinw/ai-course-devcontainer:latest",
-  "postCreateCommand": "setup-env.sh && install-mcps.sh && setup-skills.sh && skillshare install github.com/anthropics/skills/skill-creator && sync-skills.sh || true",
+  "postCreateCommand": "scripts/post-create.sh",
   "secrets": {
-    "STITCH_API_KEY": "STITCH_API_KEY"
+    "STITCH_API_KEY": {
+      "description": "Optional API key for the Google Stitch MCP server."
+    }
   },
   "customizations": {
     "vscode": {
